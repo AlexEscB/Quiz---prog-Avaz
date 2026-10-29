@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -18,8 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import model.Integrante;
 
 /**
  * Ventana principal con el formulario de registro de integrantes.
@@ -39,10 +45,18 @@ public class FormularioIntegrante extends JFrame {
     private static final String TITULO = "Registro de Integrantes";
 
     /** Ancho inicial de la ventana en píxeles. */
-    private static final int ANCHO_VENTANA = 520;
+    private static final int ANCHO_VENTANA = 640;
 
     /** Alto inicial de la ventana en píxeles. */
-    private static final int ALTO_VENTANA = 380;
+    private static final int ALTO_VENTANA = 560;
+
+    /** Encabezados de las columnas de la tabla de registros, en orden. */
+    private static final String[] COLUMNAS_TABLA = {
+        "Nombres", "Apellidos", "Repositorio", "Tipo", "Proyecto"
+    };
+
+    /** Alto preferido de la tabla de registros, en píxeles. */
+    private static final int ALTO_TABLA = 220;
 
     /** Columnas de texto de los campos de entrada. */
     private static final int COLUMNAS_CAMPO = 28;
@@ -89,6 +103,27 @@ public class FormularioIntegrante extends JFrame {
 
     /** Botón que vacía el formulario. */
     private final JButton btnLimpiar = new JButton("Limpiar");
+
+    /** Modelo de la tabla; sus celdas no se pueden editar desde la vista. */
+    private final DefaultTableModel modeloTabla =
+            new DefaultTableModel(COLUMNAS_TABLA, 0) {
+                private static final long serialVersionUID = 1L;
+
+                /**
+                 * Impide que el usuario edite las celdas de la tabla.
+                 *
+                 * @param fila    índice de la fila
+                 * @param columna índice de la columna
+                 * @return siempre {@code false}
+                 */
+                @Override
+                public boolean isCellEditable(int fila, int columna) {
+                    return false;
+                }
+            };
+
+    /** Tabla que muestra los integrantes registrados. */
+    private final JTable tablaRegistros = new JTable(modeloTabla);
 
     // ---------- Constructor ----------
 
@@ -189,6 +224,25 @@ public class FormularioIntegrante extends JFrame {
         JOptionPane.showMessageDialog(this, mensaje, TITULO, JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Reemplaza el contenido de la tabla con los integrantes recibidos.
+     * La vista solo convierte cada objeto en una fila; no filtra ni ordena.
+     *
+     * @param integrantes registros a mostrar, en el orden de la lista
+     */
+    public void cargarTabla(List<Integrante> integrantes) {
+        modeloTabla.setRowCount(0);
+        for (Integrante integrante : integrantes) {
+            modeloTabla.addRow(new Object[] {
+                integrante.getNombres(),
+                integrante.getApellidos(),
+                integrante.getRepositorio(),
+                integrante.getTipoEstudiante(),
+                integrante.getProyectoEducativo()
+            });
+        }
+    }
+
     // ---------- Métodos públicos: conexión con el controlador ----------
 
     /**
@@ -227,6 +281,7 @@ public class FormularioIntegrante extends JFrame {
         JPanel raiz = new JPanel(new BorderLayout(MARGEN, MARGEN));
         raiz.setBorder(BorderFactory.createEmptyBorder(MARGEN * 2, MARGEN * 2, MARGEN * 2, MARGEN * 2));
         raiz.add(crearPanelFormulario(), BorderLayout.NORTH);
+        raiz.add(crearPanelTabla(), BorderLayout.CENTER);
         raiz.add(crearPanelBotones(), BorderLayout.SOUTH);
 
         setContentPane(raiz);
@@ -251,6 +306,22 @@ public class FormularioIntegrante extends JFrame {
         agregarFila(panel, gbc, 2, "Repositorio (GitHub):", txtRepositorio);
         agregarFila(panel, gbc, 3, "Tipo de estudiante:", crearPanelTipo());
         agregarFila(panel, gbc, 4, "Proyecto educativo:", cmbProyecto);
+        return panel;
+    }
+
+    /**
+     * Envuelve la tabla en un scroll para que los registros largos sean navegables.
+     *
+     * @return panel con la tabla de registros
+     */
+    private JPanel crearPanelTabla() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Integrantes registrados"));
+        tablaRegistros.setFillsViewportHeight(true);
+        tablaRegistros.getTableHeader().setReorderingAllowed(false);
+        JScrollPane scroll = new JScrollPane(tablaRegistros);
+        scroll.setPreferredSize(new Dimension(ANCHO_VENTANA, ALTO_TABLA));
+        panel.add(scroll, BorderLayout.CENTER);
         return panel;
     }
 
