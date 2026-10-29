@@ -47,6 +47,7 @@ public class IntegranteController {
         this.vista = vista;
         vista.agregarListenerRegistrar(e -> registrarIntegrante());
         vista.agregarListenerLimpiar(e -> vista.limpiarFormulario());
+        vista.agregarListenerConsultar(e -> consultarRegistros());
     }
 
     // ---------- Métodos privados: acciones ----------
@@ -77,6 +78,17 @@ public class IntegranteController {
         // 4. Confirmar al usuario y dejar el formulario listo para otro registro.
         vista.mostrarMensaje(construirMensajeConfirmacion(nuevo));
         vista.limpiarFormulario();
+    }
+
+    /**
+     * Envía una copia de los registros a la vista. La copia evita que la tabla
+     * modifique la lista interna del controlador.
+     */
+    private void consultarRegistros() {
+        vista.cargarTabla(List.copyOf(registros));
+        if (registros.isEmpty()) {
+            vista.mostrarMensaje("Todavía no hay integrantes registrados.");
+        }
     }
 
     /**
