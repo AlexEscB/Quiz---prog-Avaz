@@ -64,6 +64,12 @@ public class FormularioIntegrante extends JFrame {
     /** Separación interna entre celdas del formulario, en píxeles. */
     private static final int MARGEN = 6;
 
+    /** Margen exterior de la ventana, en píxeles. */
+    private static final int MARGEN_VENTANA = 12;
+
+    /** Separación horizontal entre los botones de la barra inferior, en píxeles. */
+    private static final int ESPACIO_BOTONES = 12;
+
     /** Opciones del combo de proyectos educativos. */
     private static final String[] PROYECTOS = {
         "Ingeniería de Sistemas",
@@ -279,7 +285,7 @@ public class FormularioIntegrante extends JFrame {
      */
     private void construirInterfaz() {
         JPanel raiz = new JPanel(new BorderLayout(MARGEN, MARGEN));
-        raiz.setBorder(BorderFactory.createEmptyBorder(MARGEN * 2, MARGEN * 2, MARGEN * 2, MARGEN * 2));
+        raiz.setBorder(BorderFactory.createEmptyBorder(MARGEN_VENTANA, MARGEN_VENTANA, MARGEN_VENTANA, MARGEN_VENTANA));
         raiz.add(crearPanelFormulario(), BorderLayout.NORTH);
         raiz.add(crearPanelTabla(), BorderLayout.CENTER);
         raiz.add(crearPanelBotones(), BorderLayout.SOUTH);
@@ -301,11 +307,12 @@ public class FormularioIntegrante extends JFrame {
         gbc.insets = new Insets(MARGEN, MARGEN, MARGEN, MARGEN);
         gbc.anchor = GridBagConstraints.WEST;
 
-        agregarFila(panel, gbc, 0, "Nombres:", txtNombres);
-        agregarFila(panel, gbc, 1, "Apellidos:", txtApellidos);
-        agregarFila(panel, gbc, 2, "Repositorio (GitHub):", txtRepositorio);
-        agregarFila(panel, gbc, 3, "Tipo de estudiante:", crearPanelTipo());
-        agregarFila(panel, gbc, 4, "Proyecto educativo:", cmbProyecto);
+        int fila = 0;
+        agregarFila(panel, gbc, fila++, "Nombres:", txtNombres);
+        agregarFila(panel, gbc, fila++, "Apellidos:", txtApellidos);
+        agregarFila(panel, gbc, fila++, "Repositorio (GitHub):", txtRepositorio);
+        agregarFila(panel, gbc, fila++, "Tipo de estudiante:", crearPanelTipo());
+        agregarFila(panel, gbc, fila, "Proyecto educativo:", cmbProyecto);
         return panel;
     }
 
@@ -343,7 +350,7 @@ public class FormularioIntegrante extends JFrame {
      * @return panel con Registrar, Consultar y Limpiar
      */
     private JPanel crearPanelBotones() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, MARGEN * 2, 0));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, ESPACIO_BOTONES, 0));
         panel.add(btnRegistrar);
         panel.add(btnConsultar);
         panel.add(btnLimpiar);
@@ -353,11 +360,11 @@ public class FormularioIntegrante extends JFrame {
     /**
      * Agrega una fila de dos columnas: etiqueta a la izquierda y componente a la derecha.
      *
-     * @param panel       panel contenedor con GridBagLayout
-     * @param gbc         restricciones reutilizadas entre filas
-     * @param fila        índice de la fila (desde 0)
+     * @param panel         panel contenedor con GridBagLayout
+     * @param gbc           restricciones reutilizadas entre filas
+     * @param fila          índice de la fila (desde 0)
      * @param textoEtiqueta texto de la etiqueta
-     * @param componente  componente de entrada de la fila
+     * @param componente    componente de entrada de la fila
      */
     private void agregarFila(JPanel panel, GridBagConstraints gbc, int fila,
                              String textoEtiqueta, Component componente) {
